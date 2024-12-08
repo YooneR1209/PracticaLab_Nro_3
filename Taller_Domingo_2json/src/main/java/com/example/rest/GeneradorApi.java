@@ -1,8 +1,6 @@
 package com.example.rest;
 
-import controller.Dao.servicies.FamiliaServicies;
 import controller.Dao.servicies.GeneradorServicies;
-import models.Generador;
 
 import java.util.HashMap;
 import javax.ws.rs.GET;
@@ -15,7 +13,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.Response.StatusType;
 
 @Path("generador")
 public class GeneradorApi {

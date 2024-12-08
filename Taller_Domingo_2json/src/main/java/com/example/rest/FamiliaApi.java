@@ -1,10 +1,6 @@
 package com.example.rest;
 
 import controller.Dao.servicies.FamiliaServicies;
-import controller.Dao.servicies.GeneradorServicies;
-import models.Generador;
-import controller.tda.list.LinkedList;
-
 
 import java.util.HashMap;
 
@@ -18,7 +14,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.Response.StatusType;
 import models.HistorialTransacciones;
 import models.Transacciones;
 
@@ -106,8 +101,6 @@ public class FamiliaApi {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response update(HashMap map) {
-        //todo
-        //Validation
 
         HashMap res = new HashMap<>();
 
@@ -144,6 +137,7 @@ public class FamiliaApi {
     public Response getType() {
         HashMap map = new HashMap<>();
         FamiliaServicies ps = new FamiliaServicies();
+
         map.put("msg", "Ok");
         map.put("data", ps.getFamilia());
         return Response.ok(map).build();
@@ -186,11 +180,10 @@ public class FamiliaApi {
     @Produces(MediaType.APPLICATION_JSON)
     public Response contarFamiliasConGenerador() {
         FamiliaServicies fs = new FamiliaServicies();
-        int totalFamiliasConGenerador = fs.contarFamiliasConGenerador();
 
         HashMap<String, Object> response = new HashMap<>();
         response.put("msg", "Ok");
-        response.put("familiasConGenerador", totalFamiliasConGenerador);
+        response.put("familiasConGenerador", fs.contarFamiliasConGenerador());
         
         return Response.ok(response).build();
     }
@@ -200,15 +193,13 @@ public class FamiliaApi {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFamiliaFirstApellido(@PathParam("texto") String texto) {
         HashMap map = new HashMap<>();
-        FamiliaServicies ps = new FamiliaServicies();
+        FamiliaServicies fs = new FamiliaServicies();
 
         map.put("msg", "Ok");
-        map.put("data", ps.buscar_Apellido_Paterno(texto).toArray());
-        // LinkedList lista = ps.buscar_Apellido_Paterno(texto);
-        // if (lista.isEmpty()) {
-        //     map.put("data", new Object[]{});
-        //    return Response.status(Status.BAD_REQUEST).entity(map).build();
-        // }
+        map.put("data", fs.buscar_Apellido_Paterno(texto).toArray());
+        if (fs.buscar_Apellido_Paterno(texto).isEmpty()) {
+            map.put("data", new Object[]{});
+        }
 
 
         return Response.ok(map).build();
@@ -219,17 +210,15 @@ public class FamiliaApi {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFamiliaSecondApellido(@PathParam("texto") String texto) {
         HashMap map = new HashMap<>();
-        FamiliaServicies ps = new FamiliaServicies();
+        FamiliaServicies fs = new FamiliaServicies();
 
         map.put("msg", "Ok");
-        map.put("data", ps.buscar_Apellido_Materno(texto).toArray());
+        map.put("data", fs.buscar_Apellido_Materno(texto).toArray());
 
-        // LinkedList lista = ps.buscar_Apellido_Materno(texto);
-        // if (lista.isEmpty()) {
-        //     map.put("data", new Object[]{});
-        //    return Response.status(Status.BAD_REQUEST).entity(map).build();
-        // }
 
+        if (fs.buscar_Apellido_Materno(texto).isEmpty()) {
+            map.put("data", new Object[]{});
+        }
 
         return Response.ok(map).build();
     }
@@ -239,14 +228,13 @@ public class FamiliaApi {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFamiliaCanton(@PathParam("texto") String texto) {
         HashMap map = new HashMap<>();
-        FamiliaServicies ps = new FamiliaServicies();
+        FamiliaServicies fs = new FamiliaServicies();
 
         map.put("msg", "Ok");
-        map.put("data", ps.buscar_Canton(texto).toArray());
-        LinkedList lista = ps.buscar_Canton(texto);
-        if (lista.isEmpty()) {
+        map.put("data", fs.buscar_Canton(texto).toArray());
+
+        if (fs.buscar_Canton(texto).isEmpty()) {
             map.put("data", new Object[]{});
-           return Response.status(Status.BAD_REQUEST).entity(map).build();
         }
 
 
@@ -264,7 +252,7 @@ public class FamiliaApi {
         fs.setFamilia(fs.buscar_Id(id));
         map.put("data", fs.getFamilia());
         if (fs.getFamilia().getId() == null) {
-            map.put("data", "No existe familia con ese id holaa");
+            map.put("data", "No existe familia con ese id");
            return Response.status(Status.BAD_REQUEST).entity(map).build();
         }
         return Response.ok(map).build();
@@ -279,10 +267,9 @@ public class FamiliaApi {
 
         map.put("msg", "Ok");
         map.put("data", fs.buscar_Integrantes(integrantes).toArray());
-        LinkedList lista = fs.buscar_Integrantes(integrantes);
-        if (lista.isEmpty()) {
+
+        if (fs.buscar_Integrantes(integrantes).isEmpty()) {
             map.put("data", new Object[]{});
-           return Response.status(Status.BAD_REQUEST).entity(map).build();
         }
         return Response.ok(map).build();
     }
@@ -296,11 +283,11 @@ public class FamiliaApi {
 
         map.put("msg", "Ok");
         map.put("data", fs.buscar_Integrantes_Binario(integrantes));
-        // Familia lista = fs.buscar_Integrantes_Binario(integrantes);
-        // if (lista.isEmpty()) {
-        //     map.put("data", new Object[]{});
-        //    return Response.status(Status.BAD_REQUEST).entity(map).build();
-        // }
+
+        if (fs.buscar_Integrantes_Binario(integrantes) == null) {
+            map.put("data", "No existe familia con ese numero de integrantes");
+           return Response.status(Status.BAD_REQUEST).entity(map).build();
+        }
         return Response.ok(map).build();
     }
 
@@ -315,10 +302,9 @@ public class FamiliaApi {
         FamiliaServicies ps = new FamiliaServicies();
 
         map.put("msg", "Ok");
-        LinkedList lista = ps.order(attribute, type, metodo);
-        System.out.println("Lista despues de ordenar " + lista.toString());
-        map.put("data", lista.toArray());
-        if (lista.isEmpty()) {
+        map.put("data", ps.order(attribute, type, metodo).toArray());
+
+        if (ps.order(attribute, type, metodo).isEmpty()) {
             map.put("data", new Object[]{});
            return Response.status(Status.BAD_REQUEST).entity(map).build();
         }

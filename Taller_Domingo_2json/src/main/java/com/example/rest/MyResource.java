@@ -2,18 +2,11 @@ package com.example.rest;
 
 import java.util.Random;
 
-// import java.util.HashMap;
-
-// import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-// import javax.ws.rs.Produces;
-// import javax.ws.rs.core.MediaType;
-// import javax.ws.rs.core.Response;
 
 import controller.Dao.servicies.FamiliaServicies;
-// import controller.Dao.servicies.FamiliaServicies;
-import controller.tda.list.LinkedList; // Import correcto para LinkedList
-import models.Familia; // Importar tu clase Familia
+import controller.tda.list.LinkedList; 
+import models.Familia; 
 
 /**
  * Root resource (exposed at "myresource" path)
@@ -27,7 +20,8 @@ public class MyResource {
         Random random = new Random();
 
         for (int i = 0; i < familiaIntegrantes.length; i++) {
-            familiaIntegrantes[i] = new Familia();
+            Familia f = new Familia();
+            familiaIntegrantes[i] = f;
             familiaIntegrantes[i].setIntegrantes(random.nextInt(25000));
 
         }
@@ -35,75 +29,76 @@ public class MyResource {
     }
 
     public LinkedList<Familia> hacerLista() {
+
         Familia[] familiaAleatoria = this.arregloAleatorio();
-        for (int i = 0; i < familiaAleatoria.length; i++) {
-            Familia f = new Familia(familiaAleatoria[i]);
-            this.lista.add(f);
-        }
+        this.lista.toList(familiaAleatoria);
         return this.lista;
     }
 
     public void inicializarCopias () {
+        FamiliaServicies fs = new FamiliaServicies();
+        hacerLista();
+
+        LinkedList<Familia> copia1 = fs.duplicar_LinkedList(this.lista);
+        LinkedList<Familia> copia2 = fs.duplicar_LinkedList(this.lista);
+        LinkedList<Familia> copia3 = fs.duplicar_LinkedList(this.lista);
+
         // ORDENACION 
-        
-        // try {
-            hacerLista();
 
-            LinkedList<Familia> copia1 = lista.duplicateLinkedList(lista);
-            LinkedList<Familia> copia2 = lista.duplicateLinkedList(lista);
-        //     LinkedList<Familia> copia3 = lista.duplicateLinkedList(lista);
-
-        //     //ShellSort
-
-        //     long startTime = System.nanoTime();
-
-        //     copia1.shellSort("integrantes", 0);
-
-        //     long endTime = System.nanoTime(); // Marca de finalización
-        //     long duration = endTime - startTime; // Tiempo transcurrido en nanosegundos
-        //     System.out.println("Tiempo en ShellSort: " + (duration / 1_000_000) + " milisegundos.");
-
-        //     //QuickSort
-
-        //     long startTime2 = System.nanoTime();
-
-        //     copia2.quickSort("integrantes", 0);
-
-        //     long endTime2 = System.nanoTime(); // Marca de finalización
-        //     long duration2 = endTime2 - startTime2; // Tiempo transcurrido en nanosegundos
-        //     System.out.println("Tiempo en QuickSort: " + (duration2 / 1_000_000) + " milisegundos.");
-
-        //     //MergeSort
-
-        //     long startTime3 = System.nanoTime();
-
-        //     copia3.mergeSort("integrantes", 0);
-        //     long endTime3 = System.nanoTime(); // Marca de finalización
-        //     long duration3 = endTime3 - startTime3; // Tiempo transcurrido en nanosegundos
-
-        //     System.out.println("Tiempo en MergeSort: " + (duration3 / 1_000_000) + " milisegundos.");
+        try {
 
 
-        // } catch (Exception e) {
-        // System.out.println("Error" +e);}
+            //ShellSort
+
+            long inicio = System.nanoTime(); //Medimos el tiempo desde un punto fijo
+
+            copia1.shellSort("integrantes", 0);
+
+            long fin = System.nanoTime(); // Marca de finalización
+            long duracion = fin - inicio; // Tiempo transcurrido en nanosegundos
+            System.out.println("Tiempo en ShellSort: " + (duracion / 1_000_000) + " milisegundos.");
+
+            //QuickSort
+
+            long inicio2 = System.nanoTime();
+
+            copia2.quickSort("integrantes", 0);
+
+            long fin2 = System.nanoTime(); 
+            long duracion2 = fin2 - inicio2; 
+            System.out.println("Tiempo en QuickSort: " + (duracion2 / 1000000) + " milisegundos.");
+
+            //MergeSort
+
+            long inicio3 = System.nanoTime();
+
+            copia3.mergeSort("integrantes", 0);
+            long fin3 = System.nanoTime(); 
+            long duracion3 = fin3 - inicio3;
+
+            System.out.println("Tiempo en MergeSort: " + (duracion3 / 1000000) + " milisegundos.");
 
 
-        // hacerLista();
+        } catch (Exception e) {
+        System.out.println("Error" +e);}
+
+
         // BUSQUEDA
 
         // Secuencial
         try {
+            System.out.println(copia1.get(0).getIntegrantes() +  " / " + copia2.get(0).getIntegrantes());
+            
+            System.out.println("Tienen la misma referencia? " + (copia1.get(0) == copia2.get(0)));
 
-            FamiliaServicies fs = new FamiliaServicies();
-
-            long startTime = System.nanoTime();
+            long inicio = System.nanoTime();
 
             LinkedList<Familia> resultado = fs.buscar_Integrantes_Prueba_Lineal(copia1, 5000);
             System.out.println(resultado.toString());
 
-            long endTime = System.nanoTime(); 
-            long duration = endTime - startTime; 
-            System.out.println("Tiempo en Lineal: " + (duration / 1_000_000) + " milisegundos.");
+            long fin = System.nanoTime(); 
+            long duracion = fin - inicio; 
+            System.out.println("Tiempo en Lineal: " + (duracion / 1_000_000) + " milisegundos.");
             
         } catch (Exception e) {
         System.out.println("Error" +e);}
@@ -111,23 +106,20 @@ public class MyResource {
         // Lineal-binaria
         try {
 
-            FamiliaServicies fs = new FamiliaServicies();
-            copia2.mergeSort("integrantes", 0);
+            // copia2.mergeSort("integrantes", 0);
 
-            long startTime = System.nanoTime();
+            long inicio = System.nanoTime();
 
             LinkedList<Familia> resultado = fs.buscar_Integrantes_Prueba(copia2, 5000);
             System.out.println(resultado.toString());
 
-            long endTime = System.nanoTime(); 
-            long duration = endTime - startTime; 
-            System.out.println("Tiempo en Lineal-Binario: " + (duration / 1_000_000) + " milisegundos.");
+            long fin = System.nanoTime(); 
+            long duracion = fin - inicio; 
+            System.out.println("Tiempo en Lineal-Binario: " + (duracion / 1000000) + " milisegundos.");
             
         } catch (Exception e) {
         System.out.println("Error" +e);}
-
-        
-    
+   
     }
 
     public static void main(String[] args) {

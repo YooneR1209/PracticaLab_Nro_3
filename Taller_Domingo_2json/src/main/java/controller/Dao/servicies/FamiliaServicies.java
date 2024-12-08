@@ -83,5 +83,9 @@ public class FamiliaServicies {
         return obj.buscar_Integrantes_LinealBinaria_PL(lista, integrantes);
     }
 
+    public LinkedList<Familia> duplicar_LinkedList(LinkedList<Familia> lista) {
+        return obj.duplicateLinkedList(lista);
+    }
+
     
 }

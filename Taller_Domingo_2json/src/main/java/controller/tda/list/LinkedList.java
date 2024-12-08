@@ -2,10 +2,7 @@ package controller.tda.list;
 
 import java.lang.reflect.Method;
 
-import javax.ws.rs.core.Link;
-
 import controller.tda.list.LinkedList;
-import models.Familia;
 
 public class LinkedList<E> {
     private Node<E> header; // Nodo cabecera (el primer nodo de la lista)
@@ -164,7 +161,7 @@ public class LinkedList<E> {
                 help = help.getNext();
             }
         } catch (Exception e) {
-            sb.append(e.getMessage());
+            sb.append("Error aquí " + e.getMessage());
         }
         return sb.toString();
     }
@@ -340,7 +337,8 @@ public class LinkedList<E> {
                     E aux = lista[i];
                     int j;
 
-                    for (j = i; j >= gap && attribute_compare(attribute, lista[j - gap], aux, type); j -= gap) {
+                    for (j = i; j >= gap
+                            && attribute_compare(attribute, lista[j - gap], aux, type); j -= gap) {
                         lista[j] = lista[j - gap];
                     }
 
@@ -356,40 +354,41 @@ public class LinkedList<E> {
 
     public LinkedList<E> quickSort(String attribute, Integer type) throws Exception {
         if (!isEmpty()) {
-            // System.out.println("Estamos usando quickSort");
+            System.out.println("Estamos usando quickSort");
             E[] lista = this.toArray();
-            quickSortHelper(lista, 0, lista.length - 1, attribute, type);
+            quickSortAliado(lista, 0, lista.length - 1, attribute, type);
             this.toList(lista);
         }
         return this;
     }
 
-    private void quickSortHelper(E[] arr, int low, int high, String attribute, Integer type) throws Exception {
-        if (low < high) {
-            int pivotIndex = partition(arr, low, high, attribute, type);
-            quickSortHelper(arr, low, pivotIndex - 1, attribute, type);
-            quickSortHelper(arr, pivotIndex + 1, high, attribute, type);
+    private void quickSortAliado(E[] arreglo, int izquierda, int derecha, String attribute, Integer type)
+            throws Exception {
+        if (izquierda < derecha) {
+            int pivoteIndex = particion(arreglo, izquierda, derecha, attribute, type);
+            quickSortAliado(arreglo, izquierda, pivoteIndex - 1, attribute, type);
+            quickSortAliado(arreglo, pivoteIndex + 1, derecha, attribute, type);
         }
     }
 
-    private int partition(E[] arr, int low, int high, String attribute, Integer type) throws Exception {
-        E pivot = arr[high];
-        int i = low - 1;
+    private int particion(E[] arreglo, int izquierda, int derecha, String attribute, Integer type) throws Exception {
+        E pivote = arreglo[derecha];
+        int i = izquierda - 1; // i representa los elementos ordenados, por eso empieza en -1
 
-        for (int j = low; j < high; j++) {
-            if (attribute_compare(attribute, pivot, arr[j], type)) {
+        for (int j = izquierda; j < derecha; j++) {
+            if (attribute_compare(attribute, pivote, arreglo[j], type)) {
                 i++;
-                swap(arr, i, j);
+                intercambio(arreglo, i, j);
             }
         }
-        swap(arr, i + 1, high);
+        intercambio(arreglo, i + 1, derecha);
         return i + 1;
     }
 
-    private void swap(E[] arr, int i, int j) {
-        E temp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = temp;
+    private void intercambio(E[] arreglo, int i, int j) {
+        E temp = arreglo[i];
+        arreglo[i] = arreglo[j];
+        arreglo[j] = temp;
     }
 
     // FIN QUICKSORT
@@ -398,61 +397,61 @@ public class LinkedList<E> {
 
     public LinkedList<E> mergeSort(String attribute, Integer type) throws Exception {
         if (!isEmpty()) {
-            E[] lista = this.toArray(); 
-            lista = mergeSortHelper(lista, attribute, type); 
-            this.toList(lista); 
+            E[] lista = this.toArray();
+            lista = mergeSortAliado(lista, attribute, type);
+            this.toList(lista);
         }
         return this;
     }
 
-    private E[] mergeSortHelper(E[] array, String attribute, Integer type) throws Exception {
-        if (array.length < 2) {
-            return array; 
+    private E[] mergeSortAliado(E[] arreglo, String attribute, Integer type) throws Exception {
+        if (arreglo.length < 2) {
+            return arreglo;
+        } else {
+
+            int mid = arreglo.length / 2;
+            E[] izquierda = copiarRangoArray(arreglo, 0, mid);
+            E[] derecha = copiarRangoArray(arreglo, mid, arreglo.length);
+
+            izquierda = mergeSortAliado(izquierda, attribute, type);
+            derecha = mergeSortAliado(derecha, attribute, type);
+
+            return merge(izquierda, derecha, attribute, type);
         }
-    
-        int mid = array.length / 2; 
-        E[] left = copiarRangoArray(array, 0, mid); 
-        E[] right = copiarRangoArray(array, mid, array.length); 
-    
-        left = mergeSortHelper(left, attribute, type);
-        right = mergeSortHelper(right, attribute, type);
-    
-        return merge(left, right, attribute, type);
     }
 
-    private E[] copiarRangoArray(E[] array, int start, int end) {
-        int length = end - start;
-        E[] newArray = (E[]) new Object[length];
+    private E[] copiarRangoArray(E[] arreglo, int inicio, int fin) {
+        int length = fin - inicio;
+        E[] nuevoArreglo = (E[]) new Object[length];
         for (int i = 0; i < length; i++) {
-            newArray[i] = array[start + i];
+            nuevoArreglo[i] = arreglo[inicio + i];
         }
-        return newArray;
+        return nuevoArreglo;
     }
-    
-    
-    private E[] merge(E[] left, E[] right, String attribute, Integer type) throws Exception {
-        E[] resultado = (E[]) new Object[left.length + right.length]; 
+
+    private E[] merge(E[] izquierda, E[] derecha, String attribute, Integer type) throws Exception {
+        E[] resultado = (E[]) new Object[izquierda.length + derecha.length];
         int i = 0, j = 0, k = 0;
 
-        while (i < left.length && j < right.length) {
-            if (attribute_compare(attribute, left[i], right[j], type)) {
-            resultado[k++] = right[j++];                
+        while (i < izquierda.length && j < derecha.length) {
+            if (attribute_compare(attribute, izquierda[i], derecha[j], type)) {
+                resultado[k++] = derecha[j++];      //Recordatorio: k++ pasa primero k y luego incrementa ++
             } else {
-            resultado[k++] = left[i++];
+                resultado[k++] = izquierda[i++];
 
             }
         }
-        while (i < left.length) {
-            resultado[k++] = left[i++];
+        while (i < izquierda.length) {  //Elementos que aún no hemos agregado
+            resultado[k++] = izquierda[i++];
         }
-        while (j < right.length) {
-            resultado[k++] = right[j++];
+        while (j < derecha.length) {
+            resultado[k++] = derecha[j++];
         }
 
         return resultado;
     }
 
-    //FIN MERGESORT
+    // FIN MERGESORT
 
     private Boolean compare(Object a, Object b, Integer type) {
         switch (type) {
@@ -513,24 +512,5 @@ public class LinkedList<E> {
 
         return null;
     }
-    
-    public LinkedList<Familia> duplicateLinkedList(LinkedList<Familia> lista) {
-        LinkedList<Familia> nueva = new LinkedList<>();
-        try {
-            for (int i = 0; i < lista.getSize(); i++) {
-                Familia original = lista.get(i);
-                Familia copia = new Familia(original);  
-                nueva.add(copia);
-            }
-            return nueva;
-        } catch (Exception e) {
-            System.out.println("Error "+e);        
-        }
-        return nueva;
-
-    }
-    
-    
-    
 
 }

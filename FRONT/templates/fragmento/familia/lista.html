@@ -16,33 +16,36 @@
 {% endwith %}
 
 <script>
-    $(document).ready(function() {
-
+    $(document).ready(function() {  //Se ejecuta solo cuando la página ha terminado de cargarse
+        // Función para actualizar la URL de búsqueda
         function actualizarUrlBusqueda() {
         var baseUrl = 'http://localhost:5000/admin/familia/search/';
-        var texto = $("#texto").val();
+        var texto = $("#texto").val();  //Capturamos los valores del input
         var criterio = $("#criterio").val();
         var busqueda = $("#busqueda").val();
 
+        // Ajuste para cambiar el criterio si se selecciona "binario"
         if (busqueda === "binario" && criterio === "integrantes") {
             criterio = "integrantesBinario";
         }
 
         var url = baseUrl + criterio + '/' + texto + '?metodo=' + $("#metodo").val();
-        $("#btn").attr("href", url);
+        $("#btn").attr("href", url);   // Actualizamos en atributo href con #btn
     }
 
-        $("#texto").keyup(actualizarUrlBusqueda);   // Evento para actualizar la URL de búsqueda dinámicamente
-        $("#criterio, #metodo").change(actualizarUrlBusqueda);
+        // Evento para actualizar la URL de búsqueda dinámicamente
+        $("#texto").keyup(actualizarUrlBusqueda);   //Evento keyup: llama a la funcion actualizarUrlBusqueda cada vez que soltamos una tecla en el campo texto
+        $("#criterio, #metodo").change(actualizarUrlBusqueda);    //Evento change: llama a la función actualizarUrlBusqueda cada vez que citerio o metodo cambian
 
-        $(".orden-link").click(function(e) {
-            e.preventDefault(); // Evitamos recargar la página
-            var urlBase = 'http://localhost:5000/admin/familia/order/';
+        // Agregar funcionalidad a los enlaces de ordenamiento
+        $(".orden-link").click(function(e) {   //Asociamos un evento click a los elementos HTML que pertenezcan a la clase orden-link
+            e.preventDefault(); // Evitar recargar la página
+            var urlBase = 'http://localhost:5000/admin/familia/order/';   
             var campo = $(this).data('campo');
             var orden = $(this).data('orden'); // 1 para ascendente, 0 para descendente
             var metodo = $("#metodo").val(); // Método de ordenamiento seleccionado
             var nuevaUrl = urlBase + campo + '/' + orden + '/' + metodo;
-            window.location.href = nuevaUrl; // Nos rederigimos a la nueva URL
+            window.location.href = nuevaUrl; // Redirigir a la nueva URL
         });
     });
 </script>
